@@ -10,9 +10,7 @@ LightCommanderProjector::~LightCommanderProjector(void)
 {
 }
 
-bool LightCommanderProjector::projectImage(cv::Mat image){
-
-
-
-
+bool LightCommanderProjector::projectImage(cv::Mat image)
+{
+  return false;
 }

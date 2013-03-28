@@ -1,6 +1,7 @@
 #ifndef PROJECTOR_I_PROJECTOR_H_
 #define PROJECTOR_I_PROJECTOR_H_
 
+#include <cv.h>
 
 class IProjector
 {
