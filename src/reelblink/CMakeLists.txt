@@ -11,11 +11,35 @@ set(NAME ReelBlink)
 #	List all of the sources to be compiled
 #	---------------------------------------------------------------------------------------
 
-set(SOURCES
- IProjector.h
-	LightCommanderProjector.h
-LightCommanderProjector.cpp
+set(SOURCES 
+    IProjector.h
 )
+
+#   ----------------------------------------------
+#   Allow the option to compile with LightCommander
+#   ----------------------------------------------
+option(REELBLINK_LIGHTCOMMANDER_PROJECTOR "Build with LightCommander Projector" OFF)
+if(REELBLINK_LIGHTCOMMANDER_PROJECTOR)
+    SET(USE_LIGHTCOMMANDER_PROJECTOR ON)
+    message(STATUS "Building with LightCommander Projector Functionality")
+
+    find_package(LightCommander REQUIRED)
+    if(LIGHTCOMMANDER_FOUND)
+        include_directories(${LIGHTCOMMANDER_INCLUDE_DIRS})
+        LIST(APPEND LIBS ${LIGHTCOMMANDER_LIBRARIES})
+
+        SET(REELBLINK_INCLUDE_DIRS ${REELBLINK_INCLUDE_DIRS} ${LIGHTCOMMANDER_INCLUDE_DIR})
+        SET(REELBLINK_LIBRARIES ${REELBLINK_LIBRARIES} ${LIGHTCOMMANDER_LIBRARIES})
+
+        LIST(APPEND SOURCES
+            LightCommanderProjector.h
+            LightCommanderProjector.cpp
+        )
+
+    endif(LIGHTCOMMANDER_FOUND)
+else()
+    SET(USE_LIGHTCOMMANDER_PROJECTOR OFF)
+endif()
 
 
 #	----------------------------------------------
