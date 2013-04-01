@@ -6,9 +6,9 @@
 class IProjector
 {
 public:
-	virtual bool projectImage(cv::Mat image) = 0;
-	virtual int getWidth() = 0;
-	virtual int getHeight() = 0;
+	virtual bool ProjectImage(cv::Mat image) = 0;
+	virtual int GetWidth() = 0;
+	virtual int GetHeight() = 0;
 };
 
 #endif //PROJECTOR_I_PROJECTOR_H_
