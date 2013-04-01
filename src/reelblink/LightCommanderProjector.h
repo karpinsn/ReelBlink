@@ -4,6 +4,7 @@
 #define MSB_HIGH 0x10000000
 #define MSB_LOW 0x01111111
 
+#include <algorithm>
 #include <memory>
 #include <PortabilityLayer.h>
 
@@ -20,7 +21,10 @@ public:
   bool ProjectImage(cv::Mat image);
   int GetWidth( void );
   int GetHeight( void );
+  bool SetLEDIntensity(float r, float g, float b, float ir);
+
 private:
+  bool _SetLED(LED_t led, float intensity);
   unique_ptr<Byte[]> _Convert2BinaryImage(cv::Mat byteImage);
   bool _CheckLogError(Status status);
 };

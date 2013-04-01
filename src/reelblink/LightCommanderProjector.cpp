@@ -11,26 +11,34 @@ bool LightCommanderProjector::Init( void )
 {
   Byte logLevel = 0;
   
+  // Init communications with the projector
   if(!_CheckLogError(InitPortabilityLayer(logLevel+1, logLevel, LightCommanderCCallback)))
   {
-		// We have a problem initializing. Just log and be done
-		cout << "Unable to initalize connection to the projector\n";
-		return false;
+	// We have a problem initializing. Just log and be done
+	cout << "Unable to initalize connection to the projector\n";
+	return false;
   }
 
-	UInt16 order[1];
-	order[0] = 0;
-	if ( !_CheckLogError( DLP_RegIO_WriteImageOrderLut(1, order, 1) ) )
-	{
-		cout << "Unable to specify image order\n";
-		return false;
-	}
+  // Disable flash compile. We will just send all commands over USB/SPI
+  if( !_CheckLogError( DLP_FlashCompile_SetCompileMode(false) ) )
+  {
+	cout << "Can't disable flash compile mode\n";
+	return false;
+  }
 
-	if ( !_CheckLogError( DLP_Source_SetDataSource( SL_SW ) ) )
-	{
-		cout << "Unable to set the data source\n";
-		return false;
-	}
+  UInt16 order[1];
+  order[0] = 0;
+  if ( !_CheckLogError( DLP_RegIO_WriteImageOrderLut(1, order, 1) ) )
+  {
+	cout << "Unable to specify image order\n";
+	return false;
+  }
+
+  if ( !_CheckLogError( DLP_Source_SetDataSource( SL_SW ) ) )
+  {
+	cout << "Unable to set the data source\n";
+	return false;
+  }
 
   return true;
 }
@@ -53,17 +61,23 @@ bool LightCommanderProjector::ProjectImage(cv::Mat image)
 	return false;
   }
 
+  if( !SetLEDIntensity(100, 100, 100, 100) )
+  {
+	cout << "Unable to set LEDs\n";
+	return false;
+  }
+
   if( !_CheckLogError( DLP_Display_DisplayPatternManualForceFirstPattern( ) ) )
   {
 	cout << "Unable to display the first pattern\n";
 	return false;
   }
 
-	if( !_CheckLogError( DLP_Display_DisplayPatternAutoStepRepeatForMultiplePasses( ) ) )
-	{
-			cout << "Unable to project pattern\n";
-			return false;
-	}
+  if( !_CheckLogError( DLP_Display_DisplayPatternAutoStepRepeatForMultiplePasses( ) ) )
+  {
+	cout << "Unable to project pattern\n";
+	return false;
+  }
 
   return true;
 }
@@ -80,6 +94,30 @@ int LightCommanderProjector::GetHeight()
   // According to the documentation the 
   // LightCommander will only ever project this size
   return 768;
+}
+
+bool LightCommanderProjector::SetLEDIntensity(float r, float g, float b, float ir)
+{
+  if(!_SetLED(LED_R, r) || !_SetLED(LED_G, g) || !_SetLED(LED_B, b) || !_SetLED(LED_IR, ir) )
+  {
+	cout << "Unable to set the LED intensity\n";
+	return false;
+  }
+
+  return true;
+}
+
+bool LightCommanderProjector::_SetLED(LED_t led, float intensity)
+{
+  if( intensity > 0.0 )
+  {
+	if ( _CheckLogError( DLP_LED_SetLEDEnable(led, 1) ) )
+	  { return _CheckLogError( DLP_LED_SetLEDintensity(led, min(intensity, 100.0f)) ); }
+	else
+	  { return false; }
+  }
+
+  return _CheckLogError( DLP_LED_SetLEDEnable(led, 0) );
 }
 
 unique_ptr<Byte[]> LightCommanderProjector::_Convert2BinaryImage(cv::Mat byteImage)
