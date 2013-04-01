@@ -3,6 +3,8 @@
 
 #include "IProjector.h"
 
+#include <PortabilityLayer.h>
+
 class LightCommanderProjector : public IProjector
 {
 public:

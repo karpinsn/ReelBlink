@@ -3,6 +3,7 @@
 
 LightCommanderProjector::LightCommanderProjector(void)
 {
+
 }
 
 
@@ -17,10 +18,14 @@ bool LightCommanderProjector::projectImage(cv::Mat image)
 
 int LightCommanderProjector::getWidth()
 {
-  return 128;
+  // According to the documentation the 
+  // LightCommander will only ever project this size
+  return 1024;
 }
 
 int LightCommanderProjector::getHeight()
 {
-  return 128;
+  // According to the documentation the 
+  // LightCommander will only ever project this size
+  return 768;
 }
