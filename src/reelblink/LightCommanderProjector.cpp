@@ -13,10 +13,24 @@ bool LightCommanderProjector::Init( void )
   
   if(!_CheckLogError(InitPortabilityLayer(logLevel+1, logLevel, LightCommanderCCallback)))
   {
-	// We have a problem initializing. Just log and be done
-	cout << "Unable to initalize connection to the projector\n";
-	return false;
+		// We have a problem initializing. Just log and be done
+		cout << "Unable to initalize connection to the projector\n";
+		return false;
   }
+
+	UInt16 order[1];
+	order[0] = 0;
+	if ( !_CheckLogError( DLP_RegIO_WriteImageOrderLut(1, order, 1) ) )
+	{
+		cout << "Unable to specify image order\n";
+		return false;
+	}
+
+	if ( !_CheckLogError( DLP_Source_SetDataSource( SL_SW ) ) )
+	{
+		cout << "Unable to set the data source\n";
+		return false;
+	}
 
   return true;
 }
@@ -33,17 +47,23 @@ bool LightCommanderProjector::ProjectImage(cv::Mat image)
   auto binaryImage = _Convert2BinaryImage( image );
   auto byteCount = GetWidth() * GetHeight() / 8;
 
-  if ( _CheckLogError( DLP_Img_DownloadBitplanePatternToExtMem( binaryImage.get(), byteCount, 0 ) ) )
+  if ( !_CheckLogError( DLP_Img_DownloadBitplanePatternToExtMem( binaryImage.get(), byteCount, 0 ) ) )
   {
 	cout << "Unable to transfer images to the projector\n";
 	return false;
   }
 
-  if( _CheckLogError( DLP_Display_DisplayPatternManualForceFirstPattern( ) ) )
+  if( !_CheckLogError( DLP_Display_DisplayPatternManualForceFirstPattern( ) ) )
   {
 	cout << "Unable to display the first pattern\n";
 	return false;
   }
+
+	if( !_CheckLogError( DLP_Display_DisplayPatternAutoStepRepeatForMultiplePasses( ) ) )
+	{
+			cout << "Unable to project pattern\n";
+			return false;
+	}
 
   return true;
 }
@@ -78,7 +98,7 @@ unique_ptr<Byte[]> LightCommanderProjector::_Convert2BinaryImage(cv::Mat byteIma
 	  packedByte = byteImage.at<uchar>(row, col) >= 128 ?
 		packedByte | MSB_HIGH : packedByte & MSB_LOW;
 	  
-	  packedByte >> 1;
+	  packedByte = packedByte >> 1;
 	  currentBitIndex = (currentBitIndex + 1) % 8;
 
 	  if( !currentBitIndex )
