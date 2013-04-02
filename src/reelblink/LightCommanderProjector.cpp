@@ -162,5 +162,5 @@ void LightCommanderCCallback(String loggingCallback)
 {
   // TODO - Do nothing for right now. If we need, we can callback to the class
   // using a static function. This is just weird C stuff
-  cout << loggingCallback;
+  cout << loggingCallback << endl;
 }
