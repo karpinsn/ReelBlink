@@ -136,14 +136,17 @@ unique_ptr<Byte[]> LightCommanderProjector::_Convert2BinaryImage(cv::Mat byteIma
 	{
 	  packedByte = byteImage.at<uchar>(row, col) >= 128 ?
 		packedByte | MSB_HIGH : packedByte & MSB_LOW;
-	  
-	  packedByte = packedByte >> 1;
+	 
 	  currentBitIndex = (currentBitIndex + 1) % 8;
 
 	  if( !currentBitIndex )
 	  {
 	    binaryImage[currentByteIndex] = packedByte; 
 		currentByteIndex++;
+	  }
+	  else
+	  {
+		packedByte = packedByte >> 1;
 	  }
 	}
   }
