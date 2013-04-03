@@ -62,12 +62,6 @@ bool LightCommanderProjector::ProjectImage(cv::Mat image)
 	return false;
   }
 
-  if( !SetLEDIntensity(100, 100, 100, 100) )
-  {
-	cout << "Unable to set LEDs\n";
-	return false;
-  }
-
   if( !_CheckLogError( DLP_Display_DisplayPatternManualForceFirstPattern( ) ) )
   {
 	cout << "Unable to display the first pattern\n";
@@ -77,6 +71,12 @@ bool LightCommanderProjector::ProjectImage(cv::Mat image)
   if( !_CheckLogError( DLP_Display_DisplayPatternAutoStepRepeatForMultiplePasses( ) ) )
   {
 	cout << "Unable to project pattern\n";
+	return false;
+  }
+
+	if( !SetLEDIntensity(100, 100, 100, 100) )
+  {
+	cout << "Unable to set LEDs\n";
 	return false;
   }
 
