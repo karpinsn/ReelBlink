@@ -74,12 +74,6 @@ bool LightCommanderProjector::ProjectImage(cv::Mat image)
 	return false;
   }
 
-	if( !SetLEDIntensity(100, 100, 100, 100) )
-  {
-	cout << "Unable to set LEDs\n";
-	return false;
-  }
-
   return true;
 }
 
