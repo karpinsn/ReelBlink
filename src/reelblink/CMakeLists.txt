@@ -15,6 +15,9 @@ set(SOURCES
     IProjector.h
 )
 
+set(REELBLINK_MOCS
+    IProjector.h)
+
 #   ----------------------------------------------
 #   Allow the option to compile with LightCommander
 #   ----------------------------------------------
@@ -30,6 +33,9 @@ if(REELBLINK_LIGHTCOMMANDER_PROJECTOR)
 
         SET(REELBLINK_INCLUDE_DIRS ${REELBLINK_INCLUDE_DIRS} ${LIGHTCOMMANDER_INCLUDE_DIR})
         SET(REELBLINK_LIBRARIES ${REELBLINK_LIBRARIES} ${LIGHTCOMMANDER_LIBRARIES})
+
+        LIST(APPEND REELBLINK_MOCS
+            LightCommanderProjector.h)
 
         LIST(APPEND SOURCES
             LightCommanderProjector.h
@@ -56,6 +62,12 @@ if(REELBLINK_GENERATE_DOC)
 	add_subdirectory(../../doc ${PROJECT_BINARY_DIR}/doc)
 endif(REELBLINK_GENERATE_DOC)
 
+#   ---------------------------------------------------------------------------------------
+#   Qt Generation
+#   ---------------------------------------------------------------------------------------
+qt4_wrap_cpp(GENERATED_SOURCES ${REELBLINK_MOCS})
+source_group("Generated Sources - Do Not Edit" FILES ${GENERATED_SOURCES})
+
 #	---------------------------------------------------------------------------------------
 #	Build the library
 #	---------------------------------------------------------------------------------------
@@ -63,5 +75,5 @@ endif(REELBLINK_GENERATE_DOC)
 set(REELBLINK_INCLUDE_DIRS ${REELBLINK_INCLUDE_DIRS} PARENT_SCOPE)
 set(REELBLINK_LIBRARIES ${REELBLINK_LIBRARIES} PARENT_SCOPE)
 
-add_library(${NAME} ${SOURCES})
+add_library(${NAME} ${SOURCES} ${GENERATED_SOURCES} ${LENS_MOCS})
 

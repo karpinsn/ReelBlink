@@ -1,6 +1,8 @@
 #ifndef PROJECTOR_LIGHT_COMMANDER_H_
 #define PROJECTOR_LIGHT_COMMANDER_H_
 
+#include <QObject>
+
 #include <algorithm>
 #include <memory>
 #include <PortabilityLayer.h>
@@ -11,6 +13,8 @@ using namespace std;
 
 class LightCommanderProjector : public IProjector
 {
+  Q_OBJECT
+
 private:
   static const Byte MSB_HIGH  = 0x80;
   static const Byte MSB_LOW	  = 0x7F;
