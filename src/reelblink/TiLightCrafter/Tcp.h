@@ -12,13 +12,6 @@
 #include "LCR_Common.h"
 
 
-
-// Need to link with Ws2_32.lib, Mswsock.lib, and Advapi32.lib
-#pragma comment (lib, "Ws2_32.lib")
-#pragma comment (lib, "Mswsock.lib")
-#pragma comment (lib, "AdvApi32.lib")
-
-
 #define TRUE                    1
 #define FALSE                   0
 
