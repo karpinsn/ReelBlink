@@ -21,7 +21,7 @@ public:
 	int TCP_Connect(string ipAddress, string port);
     int TCP_Send(int sock,  unsigned char *buffer, int length);
     int TCP_Receive(int sock, unsigned char *buffer, int length);
-    int TCP_Disconnect(int sock);
+    bool TCP_Disconnect(int sock);
 
 };
 

@@ -88,7 +88,7 @@ int Tcp::TCP_Receive(int sock, unsigned char *buffer, int length)
   return recv(sock, (char*) buffer, length, 0); 
 }
 
-int Tcp::TCP_Disconnect(int sock)
+bool Tcp::TCP_Disconnect(int sock)
 {
     //free and cleanup socket occupied memory
 	// if connected

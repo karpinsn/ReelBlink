@@ -23,6 +23,31 @@ bool LCR_Commander:: Connect_LCR(string ipAddress, string port)
 
 }
 
+bool LCR_Commander::Disconnect_LCR(void)
+{
+	if(connectedSocket >0)
+	{
+		bool disconnect = tcpClient->TCP_Disconnect(connectedSocket);
+
+		if(disconnect == true)
+		{
+		  connectedSocket = -1;
+		  return true;
+		}
+
+		else
+		{
+		   return false;
+		}
+		 
+	}
+	else
+	{
+	  return false;
+	}
+}
+
+
 bool LCR_Commander::SendLCRWriteCommand(uint8* command, long packetSize, int packetNumber)
 {
 	if(connectedSocket<0)
@@ -64,7 +89,7 @@ bool LCR_Commander::SendLCRWriteCommand(uint8* command, long packetSize, int pac
 		return false;
 	}
 
-	int payLoadLength = recieve[5]<<8+recieve[4];
+	int payLoadLength = recieve[5]<<8+recieve[4]; // the 5th is the msb and the 4th is the lsb of the payload Length
 	
 	
 	int sizeToRecieve = payLoadLength+CHECKSUM_SIZE;
@@ -114,7 +139,7 @@ bool LCR_Commander::LCR_LOAD_STATIC_IMAGE(uint8 * image,int byteCount)
 	//-------------Intermediate Packets---------------------------------------------
 	flag = Intermediate; // change the flag to intermediate
 
-	int NumberOfIntermediatePackets = 37;
+	int NumberOfIntermediatePackets = (byteCount/MAX_PAYLOAD_SIZE+1)-2;  //BYTE count divided by max packet size +1 - 2 intermediate packets, should be 37
 
 	for(int i = 0;i<NumberOfIntermediatePackets;i++)
 	{
@@ -134,7 +159,12 @@ bool LCR_Commander::LCR_LOAD_STATIC_IMAGE(uint8 * image,int byteCount)
 
 	flag = End; // change the flag to indicate last packet
 
+	/* The last packet does not contain the max payload size, to get the remaining bytes, take the total bytes of the image
+	minus the max payload multipled by the number of packets being sent, which is intermedatepacket count + first and last,
+	this will get you a neg number which is the remaing size*/
+
 	int remainingBytes = -(byteCount - ((MAX_PAYLOAD_SIZE)*(NumberOfIntermediatePackets+2)));
+
 
 	auto commandFinal = Command_Packetizer::CreateCommand((uint8) pType, (uint16) cmdId, (uint8) flag, remainingBytes, image+MAX_PAYLOAD_SIZE*NumberOfIntermediatePackets);
 
@@ -178,7 +208,7 @@ bool LCR_Commander::SetDisplayMode(DisplayMode displayMode)
 
     bool sendResult = SendLCRWriteCommand(command.get(),totalLength);
 
-	if(sendResult ==SOCKET_ERROR)
+	if(sendResult == false)
 	{
 		cout <<"LCR Set Display mode send has send error.\n";
 
@@ -188,26 +218,4 @@ bool LCR_Commander::SetDisplayMode(DisplayMode displayMode)
 	return true;
 }
 
-bool LCR_Commander::Disconnect_LCR(void)
-{
-	if(connectedSocket >0)
-	{
-		int status = tcpClient->TCP_Disconnect(connectedSocket);
 
-		if(status == 0)
-		{
-		  connectedSocket = -1;
-		  return true;
-		}
-
-		else
-		{
-		   return false;
-		}
-		 
-	}
-	else
-	{
-	  return false;
-	}
-}
