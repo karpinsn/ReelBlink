@@ -12,9 +12,6 @@
 #include "LCR_Common.h"
 
 
-#define TRUE                    1
-#define FALSE                   0
-
 using namespace std;
 
 class Tcp

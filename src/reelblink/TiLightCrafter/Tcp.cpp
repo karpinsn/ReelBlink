@@ -99,7 +99,12 @@ int Tcp::TCP_Disconnect(int sock)
 	wsaCleaned = WSACleanup();
     
 	if(socketCloced ==0 && wsaCleaned == 0)
+	{
 	  return 0;
+	}
 	else
-      return -1;
+	{
+	  return -1;
+	}
+      
 }

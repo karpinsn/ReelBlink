@@ -21,25 +21,22 @@ class LightCrafter//: public IProjector
 {
 private:
 	bool IsConnected;
-	LCR_Commander*  Commander;
-	unique_ptr<uint8[]> _Convert2BinaryImage(cv::Mat byteImage);
 
-	static const uint8 MSB_HIGH  = 0x80;
-    static const uint8 MSB_LOW	  = 0x7F;
-
+	unique_ptr<LCR_Commander> Commander;
 
 public:
-	LightCrafter(void);
-	~LightCrafter(void);
-
+	LightCrafter();
+	
 	void Connect();
 	void Disconnect();
-	bool LightCrafter::StaticDisplayMode(DisplayMode displayMode);
-	bool ProjectImage(cv::Mat image);
 
 	int LightCrafter::GetHeight(void);
-
 	int LightCrafter::GetWidth(void);
+	
+	bool LightCrafter::StaticDisplayMode();
+	bool ProjectImage(cv::Mat image);
+
+	
 };
 
 #endif

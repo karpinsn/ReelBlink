@@ -5,22 +5,22 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <memory>
 #include "LCR_Common.h"
+
 
 using namespace std;
 
 class Command_Packetizer
 {
 private:
-	void InitilizeCommandBuffer(uint8* command, uint8 packetType, uint16 commandId, uint8 flags, long payLoadLength);
-	void LoadPayLoadInBuffer (uint8 * command, uint8* payLoad, long payLoadLength);
-	void CalculateCheckSum(uint8* command, long size);
+	static void InitilizeCommandBuffer(uint8* command, uint8 packetType, uint16 commandId, uint8 flags, long payLoadLength);
+	static void LoadPayLoadInBuffer (uint8 * command, uint8* payLoad, long payLoadLength);
+	static void CalculateCheckSum(uint8* command, long size);
 
 public:
-	Command_Packetizer(void);
-	~Command_Packetizer(void);
-
-	uint8* CreateCommand(uint8 packetType, uint16 commandId, uint8 flags, long payLoadLength, uint8* payLoad);
+	
+	static unique_ptr<uint8[]> CreateCommand(uint8 packetType, uint16 commandId, uint8 flags, long payLoadLength, uint8* payLoad);
 
 };
 

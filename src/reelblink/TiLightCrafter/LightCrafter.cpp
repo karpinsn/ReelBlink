@@ -1,16 +1,10 @@
 #include "LightCrafter.h"
 
 
-LightCrafter::LightCrafter(void)
+LightCrafter::LightCrafter()
 {
-	Commander = new LCR_Commander();
+    Commander = unique_ptr<LCR_Commander>(new LCR_Commander());
 	IsConnected = false;
-}
-
-LightCrafter::~LightCrafter(void)
-{
-	if(Commander != NULL)
-		delete Commander;
 }
 
 int LightCrafter::GetHeight(void)
@@ -27,7 +21,7 @@ int LightCrafter::GetWidth(void)
 
 void LightCrafter::Connect()
 {
-   bool connected = Commander ->Connect_LCR(LCR_Default_IP,LCR_Default_PORT);
+   bool connected = Commander->Connect_LCR(LCR_Default_IP,LCR_Default_PORT);
 
 	if(!connected)
 	{
@@ -57,8 +51,9 @@ void LightCrafter::Disconnect()
 	}
 }
 
-bool LightCrafter::StaticDisplayMode(DisplayMode displayMode)
+bool LightCrafter::StaticDisplayMode()
 {
+    DisplayMode displayMode= StaticImageMode;
 	bool modeChanged = Commander -> SetDisplayMode(displayMode);
 	
 	if(!modeChanged)
@@ -67,7 +62,10 @@ bool LightCrafter::StaticDisplayMode(DisplayMode displayMode)
 	  return false;
 	}
 	else
+	{
 	  cout<<"Mode changed to Static Display.\n";
+	}
+	  
 	return true;
 }
 
@@ -75,8 +73,6 @@ bool LightCrafter::StaticDisplayMode(DisplayMode displayMode)
 bool LightCrafter::ProjectImage(cv::Mat image)
 {
     CvMat* imageStream =  BitmapCreator::CreateBitmapFromMat(image);
-
-
 	bool imageLoaded  = Commander ->LCR_LOAD_STATIC_IMAGE( imageStream->data.ptr, imageStream->step);
 
 	if(!imageLoaded)
@@ -85,44 +81,15 @@ bool LightCrafter::ProjectImage(cv::Mat image)
 	  return false;
 	}
 	else
+	{
 	  cout<<"Static Image Loaded.\n";
+	}
+	 
 
 	// everthing went smoothly
 
 	return true;
 }
 
-
-unique_ptr<uint8[]> LightCrafter::_Convert2BinaryImage(cv::Mat byteImage)
-{
-  int binaryImageSize = GetWidth() * GetHeight() / 8;
-  auto binaryImage = unique_ptr<uint8[]>( new uint8[binaryImageSize] );
-
-  uint8 packedByte = 0;
-  int currentByteIndex = 0;
-  int currentBitIndex = 0;
-  
-  for(int row = 0; row < byteImage.rows; ++row)
-  {
-	for(int col = 0; col < byteImage.cols; ++col)
-	{
-	  packedByte = byteImage.at<uchar>(row, col) >= 128 ? packedByte | MSB_HIGH : packedByte & MSB_LOW;
-	 
-	  currentBitIndex = (currentBitIndex + 1) % 8;
-
-	  if( !currentBitIndex )
-	  {
-	    binaryImage[currentByteIndex] = packedByte; 
-		currentByteIndex++;
-	  }
-	  else
-	  {
-		packedByte = packedByte >> 1;
-	  }
-	}
-  }
-
-  return binaryImage;
-}
 
 

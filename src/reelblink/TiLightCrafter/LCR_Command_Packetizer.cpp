@@ -1,22 +1,15 @@
 #include "LCR_Command_Packetizer.h"
 
-Command_Packetizer::Command_Packetizer(void)
-{
-} 
 
-Command_Packetizer::~Command_Packetizer(void)
-{
-}
-
-
-
-uint8* Command_Packetizer::CreateCommand(uint8 packetType, uint16 commandId, uint8 flags, long payLoadLength, uint8* payLoad)
+unique_ptr<uint8[]> Command_Packetizer::CreateCommand(uint8 packetType, uint16 commandId, uint8 flags, long payLoadLength, uint8* payLoad)
 {
 	int size = HEADER_SIZE+payLoadLength+CHECKSUM_SIZE;
-	uint8 * command = (uint8*)new unsigned char[size]; 
-	InitilizeCommandBuffer(command, packetType,commandId,flags,payLoadLength);
-	LoadPayLoadInBuffer(command, payLoad, payLoadLength );
-	CalculateCheckSum(command,size-1);
+	unique_ptr<uint8[]> command(new uint8[size]);
+
+	
+	InitilizeCommandBuffer(command.get(), packetType,commandId,flags,payLoadLength);
+	LoadPayLoadInBuffer(command.get(), payLoad, payLoadLength );
+	CalculateCheckSum(command.get(),size-1);
 	
 	return command;
 
@@ -24,10 +17,7 @@ uint8* Command_Packetizer::CreateCommand(uint8 packetType, uint16 commandId, uin
 
 
 void Command_Packetizer::InitilizeCommandBuffer(uint8* command, uint8 packetType, uint16 commandId, uint8 flags, long payLoadLength)
-{
-
-    //payLoadLength = payLoadLength + 6;
-    
+{    
 	command[0] = packetType;
 	command[1] = (commandId >> 8) & 0xFF;
 	command[2] = commandId & 0xFF;
@@ -39,14 +29,14 @@ void Command_Packetizer::InitilizeCommandBuffer(uint8* command, uint8 packetType
 void Command_Packetizer::LoadPayLoadInBuffer(uint8 * command, uint8* payLoad, long payLoadLength)
 {
 	if(command == NULL)
-		return;
+	{
+	  return;
+	}
+		
 
 	for( int i =0; i< payLoadLength;i++)
 	{
-	   
-	     
 		command[6+i] = payLoad[i];
-		//memcpy ((void *) command[6],(void*)payLoad,payLoadLength);
 	}
 
 	

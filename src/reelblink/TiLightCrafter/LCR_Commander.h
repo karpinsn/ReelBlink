@@ -6,6 +6,7 @@ using namespace std;
 #include <cmath>
 #include <stdio.h>
 #include <math.h>
+#include <memory>
 
 #include "Tcp.h"
 #include "LCR_Common.h"
@@ -20,15 +21,15 @@ using namespace std;
 class LCR_Commander 
 {
 private:
-	Tcp * tcpClient;
+
+    unique_ptr<Tcp> tcpClient;
+	
 	int connectedSocket;
-	Command_Packetizer* packetizer;
 
 	bool LCR_Commander::SendLCRWriteCommand(uint8* command, long packetSize, int packetNumber = -1);
 
 public:
-	LCR_Commander(void);
-	~LCR_Commander(void);
+	LCR_Commander();
 
 	bool Connect_LCR(string ipAddress, string port);
 	bool Disconnect_LCR(void);

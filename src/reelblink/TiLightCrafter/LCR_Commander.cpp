@@ -1,23 +1,11 @@
 #include "LCR_Commander.h"
 
-LCR_Commander::LCR_Commander(void)
+LCR_Commander::LCR_Commander()
 {
-	tcpClient = new Tcp();
+	tcpClient = unique_ptr<Tcp>(new Tcp());
 	connectedSocket = -1;
-
-	packetizer = new Command_Packetizer();
 }
 
-LCR_Commander::~LCR_Commander(void)
-{
-	if(tcpClient != NULL)
-		delete tcpClient;
-
-	if(packetizer != NULL)
-		delete packetizer;
-
-
-}
 
 bool LCR_Commander:: Connect_LCR(string ipAddress, string port)
 {
@@ -49,9 +37,13 @@ bool LCR_Commander::SendLCRWriteCommand(uint8* command, long packetSize, int pac
 	if(send ==SOCKET_ERROR)
 	{
 		if(packetNumber != -1)
-			cout <<"PACKET SEND, NUMBER:"<<packetNumber<<" with length:"<<packetSize<<" has recieved a socket error.\n";
+		{
+		  cout <<"PACKET SEND, NUMBER:"<<packetNumber<<" with length:"<<packetSize<<" has recieved a socket error.\n";
+		}
 		else
-			cout <<"PACKET SEND, with length:"<<packetSize<<" has recieved a socket error.\n";
+		{
+		  cout <<"PACKET SEND, with length:"<<packetSize<<" has recieved a socket error.\n";
+		}
 		return false;
 	}
 
@@ -62,17 +54,24 @@ bool LCR_Commander::SendLCRWriteCommand(uint8* command, long packetSize, int pac
 	if(rec ==SOCKET_ERROR)
 	{
 		if(packetNumber != -1)
+		{
 			cout <<"PACKET Recieve Header, NUMBER:"<<packetNumber<<" with length:"<<packetSize<<" has recieved a socket error.\n";
+		}
 		else
+		{
 			cout <<"PACKET Recieve Header, with length:"<<packetSize<<" has recieved a socket error.\n";
+		}
 		return false;
 	}
 
 	int payLoadLength = recieve[5]<<8+recieve[4];
-	int sizeToRecieve = payLoadLength+CHECKSUM_SIZE;
 	
-	uint8* recievePayLoad = new uint8[sizeToRecieve];
-	int recPayload = tcpClient->TCP_Receive(connectedSocket,recievePayLoad,sizeToRecieve);
+	
+	int sizeToRecieve = payLoadLength+CHECKSUM_SIZE;
+
+	unique_ptr<uint8[]> recievePayLoad(new uint8[sizeToRecieve]);
+
+	int recPayload = tcpClient->TCP_Receive(connectedSocket,recievePayLoad.get(),sizeToRecieve);
 	if(recPayload ==SOCKET_ERROR)
 	{
 		if(packetNumber != -1)
@@ -81,7 +80,6 @@ bool LCR_Commander::SendLCRWriteCommand(uint8* command, long packetSize, int pac
 			cout <<"PACKET Recieve PayLoad, with length:"<<packetSize<<" has recieved a socket error.\n";
 		return false;
 	}
-	delete[] recievePayLoad;
 
 	return true;
 
@@ -102,12 +100,11 @@ bool LCR_Commander::LCR_LOAD_STATIC_IMAGE(uint8 * image,int byteCount)
 
 
 			//-------------First Packet----------------------------------------------
-	uint8* commandHeader = packetizer->CreateCommand((uint8) pType, (uint16) cmdId, (uint8) flag, MAX_PAYLOAD_SIZE, image);
+	auto commandHeader = Command_Packetizer::CreateCommand((uint8) pType, (uint16) cmdId, (uint8) flag, MAX_PAYLOAD_SIZE, image);
 
 	//send the first Packet
-	bool sendFirst = SendLCRWriteCommand(commandHeader,MAX_PACKET_SIZE,1);
+	bool sendFirst = SendLCRWriteCommand(commandHeader.get(),MAX_PACKET_SIZE,1);
 	
-	delete[] commandHeader;
 	
 	if(!sendFirst)
 	{
@@ -121,10 +118,9 @@ bool LCR_Commander::LCR_LOAD_STATIC_IMAGE(uint8 * image,int byteCount)
 
 	for(int i = 0;i<NumberOfIntermediatePackets;i++)
 	{
-	  uint8* commandIntermediate = packetizer->CreateCommand((uint8) pType, (uint16) cmdId, (uint8) flag, MAX_PAYLOAD_SIZE, image+(MAX_PAYLOAD_SIZE)*(i+1));
+	  auto commandIntermediate = Command_Packetizer::CreateCommand((uint8) pType, (uint16) cmdId, (uint8) flag, MAX_PAYLOAD_SIZE, image+(MAX_PAYLOAD_SIZE)*(i+1));
 
-      bool sendIntermdiate = SendLCRWriteCommand(commandIntermediate,MAX_PACKET_SIZE,i+1);
-	  delete[] commandIntermediate;
+      bool sendIntermdiate = SendLCRWriteCommand(commandIntermediate.get(),MAX_PACKET_SIZE,i+1);
 
 	  if(!sendIntermdiate)
 	  {
@@ -140,16 +136,16 @@ bool LCR_Commander::LCR_LOAD_STATIC_IMAGE(uint8 * image,int byteCount)
 
 	int remainingBytes = -(byteCount - ((MAX_PAYLOAD_SIZE)*(NumberOfIntermediatePackets+2)));
 
-	uint8* commandFinal = packetizer->CreateCommand((uint8) pType, (uint16) cmdId, (uint8) flag, remainingBytes, image+MAX_PAYLOAD_SIZE*NumberOfIntermediatePackets);
+	auto commandFinal = Command_Packetizer::CreateCommand((uint8) pType, (uint16) cmdId, (uint8) flag, remainingBytes, image+MAX_PAYLOAD_SIZE*NumberOfIntermediatePackets);
 
 	int lastLength = remainingBytes +HEADER_SIZE+CHECKSUM_SIZE;
 
-	 bool sendFinal = SendLCRWriteCommand(commandFinal,lastLength,NumberOfIntermediatePackets+2);
+	 bool sendFinal = SendLCRWriteCommand(commandFinal.get(),lastLength,NumberOfIntermediatePackets+2);
 	 
 	 if(!sendFinal)
-	  {
-	     return false;
-	  }
+	 {
+	    return false;
+	 }
 
 
 	return true;
@@ -176,13 +172,11 @@ bool LCR_Commander::SetDisplayMode(DisplayMode displayMode)
 	uint16 payLoadLength = 0x1;
 
 	//create the command
-	uint8* command = packetizer->CreateCommand((uint8) pType, (uint16) cmdId, (uint8) flag, payLoadLength, payLoad);
-
+	auto command = Command_Packetizer::CreateCommand((uint8) pType, (uint16) cmdId, (uint8) flag, payLoadLength, payLoad);
 
 	int totalLength = HEADER_SIZE + payLoadLength + CHECKSUM_SIZE;
-	int sendResult = tcpClient->TCP_Send(connectedSocket,command,totalLength);
 
-	delete[] command;
+    bool sendResult = SendLCRWriteCommand(command.get(),totalLength);
 
 	if(sendResult ==SOCKET_ERROR)
 	{
@@ -207,10 +201,13 @@ bool LCR_Commander::Disconnect_LCR(void)
 		}
 
 		else
-		  return false;
+		{
+		   return false;
+		}
+		 
 	}
 	else
+	{
 	  return false;
-
-
+	}
 }
