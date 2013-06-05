@@ -7,7 +7,7 @@ unique_ptr<uint8[]> Command_Packetizer::CreateCommand(uint8 packetType, uint16 c
 	unique_ptr<uint8[]> command(new uint8[size]);
 
 	
-	InitilizeCommandBuffer(command.get(), packetType,commandId,flags,payLoadLength);
+	InitializeCommandBuffer(command.get(), packetType,commandId,flags,payLoadLength);
 	LoadPayLoadInBuffer(command.get(), payLoad, payLoadLength );
 	CalculateCheckSum(command.get(),size-1);
 	
@@ -16,7 +16,7 @@ unique_ptr<uint8[]> Command_Packetizer::CreateCommand(uint8 packetType, uint16 c
 }
 
 
-void Command_Packetizer::InitilizeCommandBuffer(uint8* command, uint8 packetType, uint16 commandId, uint8 flags, long payLoadLength)
+void Command_Packetizer::InitializeCommandBuffer(uint8* command, uint8 packetType, uint16 commandId, uint8 flags, long payLoadLength)
 {    
 	command[0] = packetType;
 	command[1] = (commandId >> 8) & 0xFF;
@@ -28,7 +28,7 @@ void Command_Packetizer::InitilizeCommandBuffer(uint8* command, uint8 packetType
 
 void Command_Packetizer::LoadPayLoadInBuffer(uint8 * command, uint8* payLoad, long payLoadLength)
 {
-	if(command == NULL)
+	if(command == nullptr)
 	{
 	  return;
 	}

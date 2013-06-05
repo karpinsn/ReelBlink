@@ -14,7 +14,8 @@ using namespace std;
 class Command_Packetizer
 {
 private:
-	static void InitilizeCommandBuffer(uint8* command, uint8 packetType, uint16 commandId, uint8 flags, long payLoadLength);
+
+	static void InitializeCommandBuffer(uint8* command, uint8 packetType, uint16 commandId, uint8 flags, long payLoadLength);
 	static void LoadPayLoadInBuffer (uint8 * command, uint8* payLoad, long payLoadLength);
 	static void CalculateCheckSum(uint8* command, long size);
 

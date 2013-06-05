@@ -100,11 +100,11 @@ bool Tcp::TCP_Disconnect(int sock)
     
 	if(socketCloced ==0 && wsaCleaned == 0)
 	{
-	  return 0;
+	  return true;
 	}
 	else
 	{
-	  return -1;
+	  return false;
 	}
       
 }

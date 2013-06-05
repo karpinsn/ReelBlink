@@ -25,26 +25,19 @@ bool LCR_Commander:: Connect_LCR(string ipAddress, string port)
 
 bool LCR_Commander::Disconnect_LCR(void)
 {
+	bool disconnect = false;
 	if(connectedSocket >0)
 	{
-		bool disconnect = tcpClient->TCP_Disconnect(connectedSocket);
+		disconnect = tcpClient->TCP_Disconnect(connectedSocket);
 
-		if(disconnect == true)
+		if(disconnect)
 		{
 		  connectedSocket = -1;
-		  return true;
+		 
 		}
 
-		else
-		{
-		   return false;
-		}
-		 
 	}
-	else
-	{
-	  return false;
-	}
+	return disconnect;
 }
 
 
