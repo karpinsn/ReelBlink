@@ -26,7 +26,6 @@ void LightCrafter::Connect()
 	if(!connected)
 	{
 	  cout<<"Cannot Connect to LCR.\n";
-	  //return false;
 	}
 	else
 	{
@@ -42,7 +41,6 @@ void LightCrafter::Disconnect()
 	if(!disconnected)
 	{
 	  cout<< "Could not disconnect from the LCR.\n";
-	  //return false;
 	}
 	else
 	{
@@ -59,14 +57,13 @@ bool LightCrafter::StaticDisplayMode()
 	if(!modeChanged)
 	{
 	  cout<<"Could not change display mode to Static.\n";
-	  return false;
 	}
 	else
 	{
 	  cout<<"Mode changed to Static Display.\n";
 	}
 	  
-	return true;
+	return modeChanged;
 }
 
 
@@ -78,17 +75,15 @@ bool LightCrafter::ProjectImage(cv::Mat image)
 	if(!imageLoaded)
 	{
 	  cout<<"Could not load static 608 x 684 24bit static bmp.\n";
-	  return false;
 	}
 	else
 	{
 	  cout<<"Static Image Loaded.\n";
 	}
 	 
-
 	// everthing went smoothly
 
-	return true;
+	return imageLoaded;
 }
 
 

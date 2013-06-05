@@ -24,7 +24,7 @@ private:
 
     unique_ptr<Tcp> tcpClient;
 	
-	int connectedSocket;
+	SOCKET connectedSocket;
 
 	bool LCR_Commander::SendLCRWriteCommand(uint8* command, long packetSize, int packetNumber = -1);
 

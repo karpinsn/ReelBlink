@@ -1,7 +1,7 @@
 #include "Tcp.h"
 
 
-int Tcp::TCP_Connect(string host, string port)
+SOCKET Tcp::TCP_Connect(string host, string port)
 {
    
   

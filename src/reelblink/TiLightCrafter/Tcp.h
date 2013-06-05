@@ -18,7 +18,7 @@ class Tcp
 {
 
 public:
-	int TCP_Connect(string ipAddress, string port);
+	SOCKET TCP_Connect(string ipAddress, string port);
     int TCP_Send(int sock,  unsigned char *buffer, int length);
     int TCP_Receive(int sock, unsigned char *buffer, int length);
     bool TCP_Disconnect(int sock);

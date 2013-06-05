@@ -6,12 +6,11 @@ LCR_Commander::LCR_Commander()
 	connectedSocket = -1;
 }
 
-
 bool LCR_Commander:: Connect_LCR(string ipAddress, string port)
 {
 	for(int i = 0; i<ConnectionAttempts; ++i)
 	{ 
-		int socket = tcpClient->TCP_Connect(ipAddress, port);
+		SOCKET socket = tcpClient->TCP_Connect(ipAddress, port);
 		if(socket >0)
 		{
 			connectedSocket = socket;
@@ -20,7 +19,6 @@ bool LCR_Commander:: Connect_LCR(string ipAddress, string port)
 	}
 
 	return false;
-
 }
 
 bool LCR_Commander::Disconnect_LCR(void)
@@ -58,7 +56,7 @@ bool LCR_Commander::SendLCRWriteCommand(uint8* command, long packetSize, int pac
 		{
 		  cout <<"PACKET SEND, NUMBER:"<<packetNumber<<" with length:"<<packetSize<<" has recieved a socket error.\n";
 		}
-		else
+			else
 		{
 		  cout <<"PACKET SEND, with length:"<<packetSize<<" has recieved a socket error.\n";
 		}
@@ -93,9 +91,13 @@ bool LCR_Commander::SendLCRWriteCommand(uint8* command, long packetSize, int pac
 	if(recPayload ==SOCKET_ERROR)
 	{
 		if(packetNumber != -1)
+		{			
 			cout <<"PACKET Recieve PayLoad, NUMBER:"<<packetNumber<<" with length:"<<packetSize<<" has recieved a socket error.\n";
+		}
 		else
+		{
 			cout <<"PACKET Recieve PayLoad, with length:"<<packetSize<<" has recieved a socket error.\n";
+		}
 		return false;
 	}
 
@@ -138,12 +140,10 @@ bool LCR_Commander::LCR_LOAD_STATIC_IMAGE(uint8 * image,int byteCount)
 	{
 	  auto commandIntermediate = Command_Packetizer::CreateCommand((uint8) pType, (uint16) cmdId, (uint8) flag, MAX_PAYLOAD_SIZE, image+(MAX_PAYLOAD_SIZE)*(i+1));
 
-      bool sendIntermdiate = SendLCRWriteCommand(commandIntermediate.get(),MAX_PACKET_SIZE,i+1);
-
-	  if(!sendIntermdiate)
-	  {
-	     return false;
-	  }
+      if(!SendLCRWriteCommand(commandIntermediate.get(),MAX_PACKET_SIZE,i+1))
+      {
+      	return false;
+      }
 	  
 	}
 
@@ -163,15 +163,9 @@ bool LCR_Commander::LCR_LOAD_STATIC_IMAGE(uint8 * image,int byteCount)
 
 	int lastLength = remainingBytes +HEADER_SIZE+CHECKSUM_SIZE;
 
-	 bool sendFinal = SendLCRWriteCommand(commandFinal.get(),lastLength,NumberOfIntermediatePackets+2);
+	bool sendFinal = SendLCRWriteCommand(commandFinal.get(),lastLength,NumberOfIntermediatePackets+2);
 	 
-	 if(!sendFinal)
-	 {
-	    return false;
-	 }
-
-
-	return true;
+	return sendFinal;
 }
 
 bool LCR_Commander::SetDisplayMode(DisplayMode displayMode)
@@ -204,11 +198,9 @@ bool LCR_Commander::SetDisplayMode(DisplayMode displayMode)
 	if(sendResult == false)
 	{
 		cout <<"LCR Set Display mode send has send error.\n";
+	}	
 
-		return false;
-	}
-
-	return true;
+	return sendResult;
 }
 
 
