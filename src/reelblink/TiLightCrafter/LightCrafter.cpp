@@ -19,9 +19,9 @@ int LightCrafter::GetWidth(void)
   return 608;
 }
 
-void LightCrafter::Connect()
+bool LightCrafter::Connect()
 {
-   bool connected = Commander->Connect_LCR(LCR_Default_IP,LCR_Default_PORT);
+    bool connected = Commander->Connect_LCR(LCR_Default_IP,LCR_Default_PORT);
 
 	if(!connected)
 	{
@@ -32,11 +32,12 @@ void LightCrafter::Connect()
 	  cout<<"Connected To LCR.\n";
 	  IsConnected = true;
 	}
+	return connected;
 }
 
-void LightCrafter::Disconnect()
+bool LightCrafter::Disconnect()
 {
- bool disconnected = Commander ->Disconnect_LCR();
+    bool disconnected = Commander ->Disconnect_LCR();
 
 	if(!disconnected)
 	{
@@ -47,6 +48,8 @@ void LightCrafter::Disconnect()
 	  cout<<"Disconnected from LCR.\n";
 	  IsConnected = false;
 	}
+
+	return disconnected;
 }
 
 bool LightCrafter::StaticDisplayMode()
