@@ -11,12 +11,17 @@ set(NAME ReelBlink)
 #	List all of the sources to be compiled
 #	---------------------------------------------------------------------------------------
 
+
+
 set(SOURCES 
     IProjector.h
 )
 
 set(REELBLINK_MOCS
     IProjector.h)
+#   ---------------------------------------------------------------------------
+#   Configure Dependencies
+#   ---------------------------------------------------------------------------
 
 #   ----------------------------------------------
 #   Allow the option to compile with LightCommander
@@ -46,6 +51,35 @@ if(REELBLINK_LIGHTCOMMANDER_PROJECTOR)
 else()
     SET(USE_LIGHTCOMMANDER_PROJECTOR OFF)
 endif()
+
+
+#   ----------------------------------------------
+#   Allow the option to compile with LightCrafter
+#   ----------------------------------------------
+
+option(REELBLINK_LIGHTCRAFTER_PROJECTOR "Build with LightCrafter Projector" OFF)
+if(REELBLINK_LIGHTCRAFTER_PROJECTOR)
+    SET(USE_LIGHTCRAFTER_PROJECTOR ON)
+    message(STATUS "Building with LightCrafter Projector Functionality")
+    
+	LIST(APPEND SOURCES
+		TiLightCrafter/BitmapCreator.cpp
+		TiLightCrafter/BitmapCreator.h
+		TiLightCrafter/LCR_Command_Packetizer.cpp
+		TiLightCrafter/LCR_Command_Packetizer.h
+		TiLightCrafter/LCR_Commander.cpp
+		TiLightCrafter/LCR_Commander.h
+		TiLightCrafter/LCR_Common.h
+		TiLightCrafter/LightCrafter.cpp
+		TiLightCrafter/LightCrafter.h
+		TiLightCrafter/Tcp.cpp
+		TiLightCrafter/Tcp.h)
+	
+else()
+    SET(USE_LIGHTCRAFTER_PROJECTOR OFF)
+endif()
+
+
 
 
 #	----------------------------------------------
