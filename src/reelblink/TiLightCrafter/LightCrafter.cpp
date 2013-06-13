@@ -1,10 +1,9 @@
 #include "LightCrafter.h"
 
 
-LightCrafter::LightCrafter()
+LightCrafter::LightCrafter() : IsConnected(false)
 {
-    Commander = unique_ptr<LCR_Commander>(new LCR_Commander());
-	IsConnected = false;
+  Commander = unique_ptr<LCR_Commander>(new LCR_Commander());
 }
 
 int LightCrafter::GetHeight(void)
@@ -21,73 +20,53 @@ int LightCrafter::GetWidth(void)
 
 bool LightCrafter::Connect()
 {
-    bool connected = Commander->Connect_LCR(LCR_Default_IP,LCR_Default_PORT);
-
-	if(!connected)
-	{
-	  cout<<"Cannot Connect to LCR.\n";
-	}
-	else
-	{
-	  cout<<"Connected To LCR.\n";
-	  IsConnected = true;
-	}
-	return connected;
+  // Try and connect to the LCR
+  if( !Commander->Connect_LCR(LCR_Default_IP,LCR_Default_PORT) )
+	{ cout<<"Cannot Connect to LCR.\n"; }
+  else
+  {
+	cout<<"Connected To LCR.\n";
+	IsConnected = true;
+  }
+  return IsConnected;
 }
 
 bool LightCrafter::Disconnect()
 {
-    bool disconnected = Commander ->Disconnect_LCR();
+  if(!Commander->Disconnect_LCR())
+	{ cout<< "Could not disconnect from the LCR.\n"; }
+  else
+  {
+	cout<<"Disconnected from LCR.\n";
+	IsConnected = false;
+  }
 
-	if(!disconnected)
-	{
-	  cout<< "Could not disconnect from the LCR.\n";
-	}
-	else
-	{
-	  cout<<"Disconnected from LCR.\n";
-	  IsConnected = false;
-	}
-
-	return disconnected;
+  return IsConnected;
 }
 
 bool LightCrafter::StaticDisplayMode()
 {
-    DisplayMode displayMode= StaticImageMode;
-	bool modeChanged = Commander -> SetDisplayMode(displayMode);
+  DisplayMode displayMode = StaticImageMode;
+  bool modeChanged = Commander->SetDisplayMode(displayMode);
 	
-	if(!modeChanged)
-	{
-	  cout<<"Could not change display mode to Static.\n";
-	}
-	else
-	{
-	  cout<<"Mode changed to Static Display.\n";
-	}
+  if(!modeChanged)
+	{ cout << "Could not change display mode to Static.\n"; }
+  else
+	{ cout << "Mode changed to Static Display.\n"; }
 	  
-	return modeChanged;
+  return modeChanged;
 }
 
 
 bool LightCrafter::ProjectImage(cv::Mat image)
 {
-    CvMat* imageStream =  BitmapCreator::CreateBitmapFromMat(image);
-	bool imageLoaded  = Commander ->LCR_LOAD_STATIC_IMAGE( imageStream->data.ptr, imageStream->step);
+  CvMat* imageStream = BitmapCreator::CreateBitmapFromMat(image);
+  bool imageLoaded   = Commander->LCR_LOAD_STATIC_IMAGE( imageStream->data.ptr, imageStream->step );
 
-	if(!imageLoaded)
-	{
-	  cout<<"Could not load static 608 x 684 24bit static bmp.\n";
-	}
-	else
-	{
-	  cout<<"Static Image Loaded.\n";
-	}
+  if(!imageLoaded)
+	{ cout<<"Could not load static 608 x 684 24bit static bmp.\n"; }
+  else
+	{ cout<<"Static Image Loaded.\n"; }
 	 
-	// everthing went smoothly
-
-	return imageLoaded;
+  return imageLoaded;
 }
-
-
-
