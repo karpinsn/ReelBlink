@@ -5,6 +5,7 @@ using namespace std;
 
 #include <iostream>
 #include <string>
+#include <WinSock2.h>
 
 #include "LCR_Commander.h"
 #include "LCR_Common.h"

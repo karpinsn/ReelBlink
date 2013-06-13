@@ -66,7 +66,7 @@ if(REELBLINK_LIGHTCRAFTER_PROJECTOR)
 		TiLightCrafter/BitmapCreator.cpp
 		TiLightCrafter/BitmapCreator.h
 		TiLightCrafter/LCR_Command_Packetizer.cpp
-		TiLightCrafter/LCR_Command_Packetizer.h
+        TiLightCrafter/LCR_Command_Packetizer.h
 		TiLightCrafter/LCR_Commander.cpp
 		TiLightCrafter/LCR_Commander.h
 		TiLightCrafter/LCR_Common.h
@@ -74,6 +74,14 @@ if(REELBLINK_LIGHTCRAFTER_PROJECTOR)
 		TiLightCrafter/LightCrafter.h
 		TiLightCrafter/Tcp.cpp
 		TiLightCrafter/Tcp.h)
+
+    if(WIN32)
+        LIST(APPEND REELBLINK_LIBRARIES ws2_32)
+        #target_link_libraries(MyExe wsock32 ws2_32)
+    else()
+        message(ERROR "Lightcrafter not currently supported on this system")
+    endif()
+    
 	
 else()
     SET(USE_LIGHTCRAFTER_PROJECTOR OFF)

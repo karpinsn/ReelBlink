@@ -4,6 +4,7 @@
 LightCrafter::LightCrafter() : IsConnected(false)
 {
   Commander = unique_ptr<LCR_Commander>(new LCR_Commander());
+  Connect();
 }
 
 int LightCrafter::GetHeight(void)
