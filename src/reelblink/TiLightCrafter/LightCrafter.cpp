@@ -5,6 +5,7 @@ LightCrafter::LightCrafter() : IsConnected(false)
 {
   Commander = unique_ptr<LCR_Commander>(new LCR_Commander());
   Connect();
+  StaticDisplayMode();
 }
 
 int LightCrafter::GetHeight(void)
@@ -29,11 +30,13 @@ bool LightCrafter::Connect()
 	cout<<"Connected To LCR.\n";
 	IsConnected = true;
   }
+  
   return IsConnected;
 }
 
 bool LightCrafter::Disconnect()
 {
+
   if(!Commander->Disconnect_LCR())
 	{ cout<< "Could not disconnect from the LCR.\n"; }
   else
@@ -61,7 +64,19 @@ bool LightCrafter::StaticDisplayMode()
 
 bool LightCrafter::ProjectImage(cv::Mat image)
 {
-  CvMat* imageStream = BitmapCreator::CreateBitmapFromMat(image);
+  CvMat* imageStream;
+  if(1 == image.channels())
+  {
+	cout << "Converting from single channel to triple channel image." << endl;
+	cv::Mat convertedImage;
+	cv::cvtColor( image, convertedImage, CV_GRAY2RGB );
+	imageStream = BitmapCreator::CreateBitmapFromMat(convertedImage);
+  }
+  else
+  {
+	imageStream = BitmapCreator::CreateBitmapFromMat(image);
+  }
+
   bool imageLoaded   = Commander->LCR_LOAD_STATIC_IMAGE( imageStream->data.ptr, imageStream->step );
 
   if(!imageLoaded)
