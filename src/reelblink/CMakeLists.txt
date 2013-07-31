@@ -87,8 +87,11 @@ else()
     SET(USE_LIGHTCRAFTER_PROJECTOR OFF)
 endif()
 
-
-
+#   ----------------------------------------------
+#   Generate the config file for the code
+#   ----------------------------------------------
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config-reelblink.h.in ${CMAKE_CURRENT_SOURCE_DIR}/config-reelblink.h)
+LIST(APPEND SOURCES config-reelblink.h)
 
 #	----------------------------------------------
 #	Group the source files
