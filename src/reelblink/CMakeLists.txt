@@ -26,6 +26,27 @@ set(REELBLINK_MOCS
 #   ----------------------------------------------
 #   Allow the option to compile with LightCommander
 #   ----------------------------------------------
+option(REELBLINK_QTFULLSCREEN "Build with QT fullscreen" OFF)
+if(REELBLINK_QTFULLSCREEN)
+    SET(USE_QTFULLSCREEN ON)
+    message(STATUS "Building with QTFullscreen Projector Functionality")
+	
+	LIST(APPEND REELBLINK_MOCS
+		QTFullscreen.h)
+	
+	LIST(APPEND SOURCES
+		QTFullscreen.h
+		QTFullscreen.cpp
+	)
+	
+else()
+    SET(USE_QTFULLSCREEN OFF)
+endif()
+
+
+#   ----------------------------------------------
+#   Allow the option to compile with LightCommander
+#   ----------------------------------------------
 option(REELBLINK_LIGHTCOMMANDER_PROJECTOR "Build with LightCommander Projector" OFF)
 if(REELBLINK_LIGHTCOMMANDER_PROJECTOR)
     SET(USE_LIGHTCOMMANDER_PROJECTOR ON)
