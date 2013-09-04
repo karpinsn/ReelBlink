@@ -11,8 +11,6 @@ typedef unsigned __int8 uint8;
 #define MAX_PAYLOAD_SIZE    0x7FF0
 #define CHECKSUM_SIZE		1
 
-
-
 typedef enum 
 {
 	Success = 0x00,

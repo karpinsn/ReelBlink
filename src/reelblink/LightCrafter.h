@@ -13,6 +13,7 @@ using namespace std;
 
 #include "Tcp.h"
 #include "LCR_Common.h"
+#include <stdint.h>
 
 #include "IProjector.h"
 
@@ -35,7 +36,7 @@ private:
 	LCR_Command( uint8 packetType, uint16 commandId, uint8 flags );
 	unsigned long AppendPayload( uint8* payload, unsigned long payLoadLength = MAX_PAYLOAD_SIZE );
 
-	void SetPacketType( uint8 packetType );
+	void SetFlags( uint8 flags );
 	unsigned long GetCommandSize( void );
 	uint8* GetCommand( void );
   };
@@ -50,9 +51,7 @@ public:
 	int GetWidth(void)  { return 608; }
 	int GetHeight(void) { return 684; }
 	
-	
 	bool PatternDisplayMode( );
-	bool StaticDisplayMode( );
 	bool ProjectImage(cv::Mat image);
 
 private:
