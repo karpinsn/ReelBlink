@@ -84,10 +84,8 @@ if(REELBLINK_LIGHTCRAFTER_PROJECTOR)
     message(STATUS "Building with LightCrafter Projector Functionality")
     
 	LIST(APPEND SOURCES
-		TiLightCrafter/BitmapCreator.cpp
-		TiLightCrafter/BitmapCreator.h
 		TiLightCrafter/LCR_Command_Packetizer.cpp
-        TiLightCrafter/LCR_Command_Packetizer.h
+        	TiLightCrafter/LCR_Command_Packetizer.h
 		TiLightCrafter/LCR_Commander.cpp
 		TiLightCrafter/LCR_Commander.h
 		TiLightCrafter/LCR_Common.h

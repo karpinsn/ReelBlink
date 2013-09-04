@@ -3,9 +3,10 @@
 
 LightCrafter::LightCrafter() : IsConnected(false)
 {
-  Commander = unique_ptr<LCR_Commander>(new LCR_Commander());
+  Commander = unique_ptr<LCR_Commander>( new LCR_Commander( ) );
   Connect();
-  StaticDisplayMode();
+  //PatternDisplayMode( );
+  StaticDisplayMode( );
 }
 
 int LightCrafter::GetHeight(void)
@@ -48,6 +49,17 @@ bool LightCrafter::Disconnect()
   return IsConnected;
 }
 
+bool LightCrafter::PatternDisplayMode( )
+{
+  bool modeChanged = Commander->SetDisplayMode( PatternSequenceDisplay );
+  if( !modeChanged )
+	{ cout << "Could not change display mode to pattern sequence" << endl; }
+  else
+	{ cout << "Mode changed to pattern sequence" << endl; }
+
+  return modeChanged;
+}
+
 bool LightCrafter::StaticDisplayMode()
 {
   DisplayMode displayMode = StaticImageMode;
@@ -64,20 +76,22 @@ bool LightCrafter::StaticDisplayMode()
 
 bool LightCrafter::ProjectImage(cv::Mat image)
 {
+  static const int parameters[] = { CV_IMWRITE_PXM_BINARY, 1, 0 };
+
   CvMat* imageStream;
   if(1 == image.channels())
   {
 	cout << "Converting from single channel to triple channel image." << endl;
 	cv::Mat convertedImage;
 	cv::cvtColor( image, convertedImage, CV_GRAY2RGB );
-	imageStream = BitmapCreator::CreateBitmapFromMat(convertedImage);
+	
+	// Have to cast to old C version since we are using a c function
+	imageStream = cvEncodeImage( ".bmp", &( ( CvMat ) convertedImage ), parameters );
   }
   else
-  {
-	imageStream = BitmapCreator::CreateBitmapFromMat(image);
-  }
+	{ imageStream = cvEncodeImage( ".bmp", &( ( CvMat ) image ), parameters ); }
 
-  bool imageLoaded   = Commander->LCR_LOAD_STATIC_IMAGE( imageStream->data.ptr, imageStream->step );
+  bool imageLoaded = Commander->ProjectImage( imageStream->data.ptr, imageStream->step );
 
   if(!imageLoaded)
 	{ cout<<"Could not load static 608 x 684 24bit static bmp.\n"; }

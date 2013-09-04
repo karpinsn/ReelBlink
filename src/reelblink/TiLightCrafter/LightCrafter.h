@@ -30,7 +30,8 @@ public:
 	int GetHeight(void);
 	int GetWidth(void);
 	
-	bool StaticDisplayMode();
+	bool PatternDisplayMode( );
+	bool StaticDisplayMode( );
 	bool ProjectImage(cv::Mat image);
 };
 

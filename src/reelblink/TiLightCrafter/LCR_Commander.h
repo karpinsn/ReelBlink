@@ -18,6 +18,20 @@ using namespace std;
 
 #define ConnectionAttempts 5
 
+class LCR_Command
+{
+private:
+  unsigned long m_payloadLength;
+  unique_ptr<uint8[]> m_payLoad;
+
+public:
+  LCR_Command( uint8 packetType, uint16 commandId, uint8 flags );
+  unsigned long AppendPayload( uint8* payload, unsigned long payLoadLength = MAX_PAYLOAD_SIZE );
+
+  unsigned long GetCommandSize( void );
+  uint8* GetCommand( void );
+};
+
 class LCR_Commander 
 {
 private:
@@ -26,7 +40,7 @@ private:
 	
 	SOCKET connectedSocket;
 
-	bool LCR_Commander::SendLCRWriteCommand(uint8* command, long packetSize, int packetNumber = -1);
+	bool SendLCRWriteCommand(uint8* command, long packetSize, int packetNumber = -1);
 
 public:
 	LCR_Commander();
@@ -35,9 +49,17 @@ public:
 	bool Disconnect_LCR(void);
 
 	bool SetDisplayMode(DisplayMode displayMode);
-
+	bool ProjectImage(uint8 * image,int byteCount);
 	bool LCR_LOAD_STATIC_IMAGE(uint8 * image,int byteCount);
+
+private:
+  unique_ptr<uint8[]> CreateCommand( uint8 packetType, uint16 commandId, uint8 flags, long payLoadLength, uint8* payLoad );
 };
 
+#define LC_CHECKRETURNLOGERROR( COMMAND, ERROR ) \
+{ \
+  if( !COMMAND ) \
+	{ cout << ERROR << endl; return false; } \
+}
 
 #endif
