@@ -84,15 +84,11 @@ if(REELBLINK_LIGHTCRAFTER_PROJECTOR)
     message(STATUS "Building with LightCrafter Projector Functionality")
     
 	LIST(APPEND SOURCES
-		TiLightCrafter/LCR_Command_Packetizer.cpp
-        	TiLightCrafter/LCR_Command_Packetizer.h
-		TiLightCrafter/LCR_Commander.cpp
-		TiLightCrafter/LCR_Commander.h
-		TiLightCrafter/LCR_Common.h
-		TiLightCrafter/LightCrafter.cpp
-		TiLightCrafter/LightCrafter.h
-		TiLightCrafter/Tcp.cpp
-		TiLightCrafter/Tcp.h)
+		LCR_Common.h
+		LightCrafter.cpp
+		LightCrafter.h
+		Tcp.cpp
+		Tcp.h)
 
     if(WIN32)
         LIST(APPEND REELBLINK_LIBRARIES ws2_32)
