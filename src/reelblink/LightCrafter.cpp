@@ -45,9 +45,10 @@ bool LightCrafter::PatternDisplayMode( )
   uint8 invert   = 0; patternSeqCommand.AppendPayload( &invert,   1 );
   uint8 trigger  = 1; patternSeqCommand.AppendPayload( &trigger,  1 );
   uint32_t delay   = 0; patternSeqCommand.AppendPayload( (uint8*)(&delay), 4 );
-  uint32_t period  = 5555; patternSeqCommand.AppendPayload( (uint8*)(&period), 4 );
-  uint32_t exposure = 5555; patternSeqCommand.AppendPayload( (uint8*)(&exposure), 4 );
-  uint8 led      = 1; patternSeqCommand.AppendPayload( &led, 1 );
+  uint32_t period  = 33333; patternSeqCommand.AppendPayload( (uint8*)(&period), 4 );
+  uint32_t exposure = 33333; patternSeqCommand.AppendPayload( (uint8*)(&exposure), 4 );
+  // On newer LightCrafter this means all LEDs. On the older one it will default to green
+  uint8 led      = 3; patternSeqCommand.AppendPayload( &led, 1 );
 
   // http://e2e.ti.com/support/dlp__mems_micro-electro-mechanical_systems/f/850/t/219181.aspx
   uint8 blah     = 0; patternSeqCommand.AppendPayload( &blah, 1 );
