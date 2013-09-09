@@ -113,6 +113,9 @@ bool LightCrafter::ProjectImage(cv::Mat image)
   uint8 start = 1; startCommand.AppendPayload( &start, 1 );
   LC_CHECKRETURNLOGERROR( SendLCRCommand( startCommand ), "Unable to start pattern projection" );
 
+  // Need to wait a bit as the image takes a little bit to project
+  Sleep(1000);
+
   return true;
 }
 
