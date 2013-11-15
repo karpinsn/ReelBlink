@@ -50,11 +50,14 @@ public:
 	// Resolution of the projector is set to 608 x 684 (Size of DMD)
 	int GetWidth(void)  { return 608; }
 	int GetHeight(void) { return 684; }
-	
-	bool PatternDisplayMode( );
-	bool ProjectImage(cv::Mat image);
+
+	bool CacheImages( vector<cv::Mat> images );
+	bool ProjectCachedImage( uint8 imageNumber );
+	bool ProjectImage( cv::Mat image );
 
 private:
+  bool SendImage( uint8 imageNumber, cv::Mat image );
+  bool PatternDisplayMode( uint8 patternCount = 1 );
   bool SendLCRCommand( LCR_Command& command );
 };
 

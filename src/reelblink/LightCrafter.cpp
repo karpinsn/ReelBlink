@@ -12,9 +12,7 @@ bool LightCrafter::Connect()
 {
   bool connected = false;
   for(int i = 0; !connected && i < ConnectionAttempts; ++i)
-  { 
-	connected = m_tcpClient->Connect( LCR_Default_IP, LCR_Default_PORT );
-  }
+	{ connected = m_tcpClient->Connect( LCR_Default_IP, LCR_Default_PORT ); }
 
   return connected;
 }
@@ -22,7 +20,7 @@ bool LightCrafter::Connect()
 bool LightCrafter::Disconnect()
   { return m_tcpClient->Disconnect( ); }
 
-bool LightCrafter::PatternDisplayMode( )
+bool LightCrafter::PatternDisplayMode( uint8 patternCount )
 {
   // If there is no connected socket we cannot communicate with the projector
   LC_CHECKRETURNLOGERROR( m_tcpClient->Connected( ), "Not connected to light crafter" );
@@ -41,7 +39,7 @@ bool LightCrafter::PatternDisplayMode( )
   // Modify the pattern settings
   LCR_Command patternSeqCommand( Host_Write, PatternSequencing, DataComplete );
   uint8 bitDepth = 1; patternSeqCommand.AppendPayload( &bitDepth, 1 );
-  uint8 patterns = 1; patternSeqCommand.AppendPayload( &patterns, 1 );
+  patternSeqCommand.AppendPayload( &patternCount, 1 );
   uint8 invert   = 0; patternSeqCommand.AppendPayload( &invert,   1 );
   uint8 trigger  = 1; patternSeqCommand.AppendPayload( &trigger,  1 );
   uint32_t delay   = 0; patternSeqCommand.AppendPayload( (uint8*)(&delay), 4 );
@@ -54,6 +52,19 @@ bool LightCrafter::PatternDisplayMode( )
   uint8 blah     = 0; patternSeqCommand.AppendPayload( &blah, 1 );
   LC_CHECKRETURNLOGERROR( SendLCRCommand( patternSeqCommand ), "LCR Pattern Seq error" );
 
+  return true;
+}
+
+bool LightCrafter::CacheImages( vector<cv::Mat> images )
+{
+  // Set the projector to cache mode
+  LC_CHECKRETURNLOGERROR( PatternDisplayMode( images.size( ) ), "Unable to cache images" );
+
+  for( int imageNumber = 0; imageNumber < images.size( ); ++imageNumber )
+  {
+	LC_CHECKRETURNLOGERROR( SendImage( imageNumber, images[imageNumber]  ), "Unable to transfer image" );
+  }
+
   // Start pattern projection
   LCR_Command startCommand( Host_Write, StatPatternSequence, DataComplete );
   uint8 start = 1; startCommand.AppendPayload( &start, 1 );
@@ -62,7 +73,31 @@ bool LightCrafter::PatternDisplayMode( )
   return true;
 }
 
-bool LightCrafter::ProjectImage(cv::Mat image)
+bool LightCrafter::ProjectCachedImage( uint8 imageNumber )
+{
+  LCR_Command displayCommand( Host_Write, DisplayPattern, DataComplete );
+  displayCommand.AppendPayload( &imageNumber, 1 );
+  LC_CHECKRETURNLOGERROR( SendLCRCommand( displayCommand ), "Unable to display specified image" );
+
+  return true;
+}
+
+bool LightCrafter::ProjectImage( cv::Mat image )
+{
+  LC_CHECKRETURNLOGERROR( SendImage( 0, image  ), "Unable to transfer image" );
+
+  // Start pattern projection
+  LCR_Command startCommand( Host_Write, StatPatternSequence, DataComplete );
+  uint8 start = 1; startCommand.AppendPayload( &start, 1 );
+  LC_CHECKRETURNLOGERROR( SendLCRCommand( startCommand ), "Unable to start pattern projection" );
+
+  // Need to wait a bit as the image takes a little bit to project
+  Sleep(1000);
+
+  return true;
+}
+
+bool LightCrafter::SendImage( uint8 imageNumber, cv::Mat image )
 {
   // If there is no connected socket we cannot communicate with the projector
   LC_CHECKRETURNLOGERROR( m_tcpClient->Connected( ), "Not connected to light crafter" );
@@ -93,7 +128,7 @@ bool LightCrafter::ProjectImage(cv::Mat image)
 
   // First packet has the patternNo at the beginning
   LCR_Command firstPacket( Host_Write, PatternDefinition, Beginning );
-  uint8 patternNo = 0; firstPacket.AppendPayload( &patternNo, 1 );
+  firstPacket.AppendPayload( &imageNumber, 1 );
   offset += firstPacket.AppendPayload( imageStream->data.ptr + offset, byteCount - offset );
   LC_CHECKRETURNLOGERROR( SendLCRCommand( firstPacket ), "Unable to issue command to light crafter" );
 
@@ -107,14 +142,6 @@ bool LightCrafter::ProjectImage(cv::Mat image)
 
 	LC_CHECKRETURNLOGERROR( SendLCRCommand( command ), "Unable to issue command to light crafter" );
   }
-  
-  // Start pattern projection
-  LCR_Command startCommand( Host_Write, StatPatternSequence, DataComplete );
-  uint8 start = 1; startCommand.AppendPayload( &start, 1 );
-  LC_CHECKRETURNLOGERROR( SendLCRCommand( startCommand ), "Unable to start pattern projection" );
-
-  // Need to wait a bit as the image takes a little bit to project
-  Sleep(1000);
 
   return true;
 }
