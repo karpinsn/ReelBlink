@@ -104,7 +104,8 @@ bool LightCrafter::SendImage( uint8 imageNumber, cv::Mat image )
 
   // Step 1 - Get the image into the LCR format
   static const int parameters[] = { CV_IMWRITE_PXM_BINARY, 1, 0 };
-  CvMat* imageStream;
+  shared_ptr<CvMat> imageStream; // Using old interface. Have to use custom destructor
+  
   if(1 == image.channels())
   {
 	cout << "Converting from single channel to triple channel image." << endl;
@@ -112,10 +113,16 @@ bool LightCrafter::SendImage( uint8 imageNumber, cv::Mat image )
 	cv::cvtColor( image, convertedImage, CV_GRAY2RGB );
 	
 	// Have to cast to old C version since we are using a c function
-	imageStream = cvEncodeImage( ".bmp", &( ( CvMat ) convertedImage ), parameters );
+	imageStream = shared_ptr<CvMat>(
+	  cvEncodeImage( ".bmp", &( ( CvMat ) convertedImage ), parameters ),
+	  [](CvMat* ptr){cvReleaseMat(&ptr);});
   }
   else
-	{ imageStream = cvEncodeImage( ".bmp", &( ( CvMat ) image ), parameters ); }
+  { 
+	imageStream = shared_ptr<CvMat>(
+	  cvEncodeImage( ".bmp", &( ( CvMat ) image ), parameters ),
+	  [](CvMat* ptr){cvReleaseMat(&ptr);});
+  }
 
   // Stop the pattern projection so we can adjust the settings
   LCR_Command stopCommand( Host_Write, StatPatternSequence, DataComplete );
